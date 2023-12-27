@@ -1,0 +1,15 @@
+batchsize: 32
+num_class: 101
+image_path: "/home/meow/my_data_disk_5T/food_classification/TaiwaneseFood101/Taiwanese Food 101/images/"
+train_path: "/home/meow/food_ai/food_classification/prenet_n/food_ai/prenet/T101/meta/train.txt"
+test_path: "/home/meow/food_ai/food_classification/prenet_n/food_ai/prenet/T101/meta/test.txt"
+
+model_name: "mobile_former_96m"
+weight_path: "pretrained_models/mobile-former-96m.pth.tar"
+store_name: "mobileformer_96m_in1k_448_TW101_2"
+
+learning_rate: 0.00001
+epoch: 10
+
+is_test: false
+use_pretrained: true

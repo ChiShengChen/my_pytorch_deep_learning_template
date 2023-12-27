@@ -1,0 +1,17 @@
+batchsize: 32
+num_class: 241
+image_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train600x600/"
+train_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train_n.txt"
+test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/test_n.txt"
+
+model_name: "legacy_senet154.in1k"
+# weight_path: "/home/meow/cnfood241/food_code_cn241/outputs/vgg16.tv_in1k_224_cn241/model.pth"
+weight_path: ""
+store_name: "legacy_senet154.in1k_224_cn241"
+
+img_size: 224
+learning_rate: 0.0001
+epoch: 50
+
+is_test: false
+use_pretrained: true

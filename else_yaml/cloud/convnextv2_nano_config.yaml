@@ -1,0 +1,16 @@
+batchsize: 32
+num_class: 241
+image_path: "/root/food_data/CNFOOD-241/train600x600/"
+train_path: "/root/food_data/CNFOOD-241/train_n.txt"
+test_path: "/root/food_data/CNFOOD-241/test_n.txt"
+
+model_name: "convnextv2_nano.fcmae_ft_in1k"
+weight_path: ""
+store_name: "convnextv2_nano.fcmae_ft_in1k_448_cn241"
+
+img_size: 512
+learning_rate: 0.00001
+epoch: 30
+
+is_test: false
+use_pretrained: true

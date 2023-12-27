@@ -1,0 +1,15 @@
+batchsize: 32
+num_class: 101
+image_path: "/home/meow/my_data_disk_5T/food_classification/TaiwaneseFood101/Taiwanese Food 101/images/"
+train_path: "/home/meow/food_ai/food_classification/prenet_n/food_ai/prenet/T101/meta/train.txt"
+test_path: "/home/meow/food_ai/food_classification/prenet_n/food_ai/prenet/T101/meta/test.txt"
+
+model_name: "mobilevitv2_100.cvnets_in1k"
+weight_path: ""
+store_name: "mobilevitv2_100_in1k_448_tw101"
+
+learning_rate: 0.00001
+epoch: 10
+
+is_test: false
+use_pretrained: false

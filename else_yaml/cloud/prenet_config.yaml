@@ -1,0 +1,16 @@
+batchsize: 4
+num_class: 241
+image_path: "/root/food_data/CNFOOD-241/train600x600/"
+train_path: "/root/food_data/CNFOOD-241/train_n.txt"
+test_path: "/root/food_data/CNFOOD-241/test_n.txt"
+
+model_name: "prenet"
+weight_path: "/root/src/CNFOOD-241/food_code_cn241/pretrained_models/resnet50-19c8e357.pth"
+store_name: "prenet_cn241"
+
+img_size: 512
+learning_rate: 0.0001
+epoch: 1
+
+is_test: false
+use_pretrained: true
