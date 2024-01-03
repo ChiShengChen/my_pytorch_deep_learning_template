@@ -23,7 +23,7 @@ def main(args):
 
     NUM_CATEGORIES = args["num_class"]  
 
-    model = get_model(args["model_name"], use_pretrained=args["use_pretrained"], num_classes=NUM_CATEGORIES, weight_path=args["weight_path"], is_test=args["is_test"])
+    model = get_model(args["model_name"], use_pretrained=args["use_pretrained"], train_increased=args["train_increased"], num_classes=NUM_CATEGORIES, weight_path=args["weight_path"], is_test=args["is_test"])
     # model = torch.compile(model, mode="max-autotune") #seedup
     # print(model)
     
