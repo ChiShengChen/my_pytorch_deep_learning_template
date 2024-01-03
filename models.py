@@ -17,7 +17,7 @@ custom_models = ['mobile_former_508m', 'mobile_former_96m','prenet']
 
 total_model_lists = timm_models + pytorch_models + custom_models
 
-def get_model(model_name, use_pretrained, num_classes, weight_path=None, is_test=False):
+def get_model(model_name, use_pretrained, train_increased, num_classes, weight_path=None, is_test=False):
     if model_name not in total_model_lists:
         print('Model is not included yet!')
         model = None
@@ -25,12 +25,20 @@ def get_model(model_name, use_pretrained, num_classes, weight_path=None, is_test
         model = create_model(model_name, pretrained=use_pretrained, num_classes=num_classes)
         if is_test:
             model.load_state_dict(torch.load(weight_path))
+        elif train_increased:
+            model.load_state_dict(torch.load(weight_path))
+        total_params = sum(p.numel() for p in model.parameters())
+        print(f"Total parameters in the model: {total_params}")
     elif model_name in pytorch_models:
         if model_name == 'resnet50':
             model = models.resnet50(pretrained=use_pretrained, progress=True)
             model.fc = nn.Linear(in_features=2048, out_features=num_classes, bias=True)
         if is_test:
             model.load_state_dict(torch.load(weight_path))
+        elif train_increased:
+            model.load_state_dict(torch.load(weight_path))
+        total_params = sum(p.numel() for p in model.parameters())
+        print(f"Total parameters in the model: {total_params}")
     elif model_name in custom_models:
         if model_name == 'mobile_former_508m':
             if is_test:
@@ -47,12 +55,21 @@ def get_model(model_name, use_pretrained, num_classes, weight_path=None, is_test
                 torch.nn.Dropout(p=0.0, inplace=False),
                 torch.nn.Linear(in_features=1920, out_features=num_classes, bias=True)
                 )
+            elif train_increased:
+                model = mobile_former_508m()
+                model.load_state_dict(torch.load(weight_path)['state_dict'])
+                model.classifier.classifier = torch.nn.Sequential(
+                torch.nn.Dropout(p=0.0, inplace=False),
+                torch.nn.Linear(in_features=1920, out_features=num_classes, bias=True)
+                )
             else:
                 model = mobile_former_508m()
                 model.classifier.classifier = torch.nn.Sequential(
                 torch.nn.Dropout(p=0.0, inplace=False),
                 torch.nn.Linear(in_features=1920, out_features=num_classes, bias=True)
                 )
+            total_params = sum(p.numel() for p in model.parameters())
+            print(f"Total parameters in the model: {total_params}")
             
         if model_name == 'mobile_former_96m':
             if is_test:
@@ -69,12 +86,23 @@ def get_model(model_name, use_pretrained, num_classes, weight_path=None, is_test
                 torch.nn.Dropout(p=0.0, inplace=False),
                 torch.nn.Linear(in_features=1280, out_features=num_classes, bias=True)
                 )
+            elif train_increased:
+                # print(torch.load(weight_path).keys())
+                model = mobile_former_96m()
+                model.classifier.classifier = torch.nn.Sequential(
+                torch.nn.Dropout(p=0.0, inplace=False),
+                torch.nn.Linear(in_features=1280, out_features=num_classes, bias=True)
+                )
+                model.load_state_dict(torch.load(weight_path))     
             else:
                 model = mobile_former_96m()
                 model.classifier.classifier = torch.nn.Sequential(
                 torch.nn.Dropout(p=0.0, inplace=False),
                 torch.nn.Linear(in_features=1280, out_features=num_classes, bias=True)
                 )
+            total_params = sum(p.numel() for p in model.parameters())
+            print(f"Total parameters in the model: {total_params}")
+
         if model_name == 'prenet':
             if is_test:
                 model = resnet50(pretrained=False)
@@ -90,7 +118,6 @@ def get_model(model_name, use_pretrained, num_classes, weight_path=None, is_test
                     else:
                         state_dict[k] = v
                         # print(k)
-
                 model.load_state_dict(state_dict)
                 model.fc = nn.Linear(2048, num_classes)
                 model.load_state_dict(torch.load(weight_path))
@@ -109,9 +136,18 @@ def get_model(model_name, use_pretrained, num_classes, weight_path=None, is_test
                     else:
                         state_dict[k] = v
                         # print(k)
-
                 model.load_state_dict(state_dict)
                 model.fc = nn.Linear(2048, num_classes)
+            elif train_increased:
+                model = resnet50(pretrained=False)
+                model = PRENet(model, 512, classes_num=2000)
+                model.fc = nn.Linear(2048, num_classes) 
+                # print(model) # model has no fc
+                incre_trained = torch.load(weight_path) # incre_trained has fc
+                # print(incre_trained.keys())
+                model.load_state_dict(incre_trained)
+                              
+
             else:
                 model = resnet50(pretrained=False)
                 model = PRENet(model, 512, classes_num=num_classes)
@@ -128,6 +164,8 @@ def get_model(model_name, use_pretrained, num_classes, weight_path=None, is_test
                         # print(k)
                 model.load_state_dict(state_dict)
                 model.fc = nn.Linear(2048, num_classes)
+            total_params = sum(p.numel() for p in model.parameters())
+            print(f"Total parameters in the model: {total_params}")
 
 
     return model
