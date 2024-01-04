@@ -4,7 +4,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from val_func import val, val_prenet
-from taiwanesefood_101_label2int import tw101_label2int
+from early_stopper import EarlyStopper
 
 def train_general(model, train_loader, val_loader, criterion, optimizer, lr_scheduler, num_epochs, store_name, device):
     exp_dir = 'outputs/' + store_name
@@ -19,6 +19,7 @@ def train_general(model, train_loader, val_loader, criterion, optimizer, lr_sche
         running_loss = 0.0
         running_corrects = 0
 
+        train_early_stopper = EarlyStopper(patience=5, min_delta=0.001)
 
         # Iterate over the batches of the train loader
         for inputs, labels in tqdm.tqdm(train_loader, desc=f'Epoch {epoch+1}/{num_epochs}', unit='batch'):
@@ -51,7 +52,7 @@ def train_general(model, train_loader, val_loader, criterion, optimizer, lr_sche
         train_loss = running_loss / len(train_loader.dataset)
         train_acc = running_corrects.double() / len(train_loader.dataset)
         
-
+        # lr_scheduler
         lr_scheduler.step()
 
         #evaluation the model
@@ -60,6 +61,10 @@ def train_general(model, train_loader, val_loader, criterion, optimizer, lr_sche
         # Print the epoch results
         print('Epoch [{}/{}], train loss: {:.4f}, train acc: {:.4f}, val loss: {:.4f}, val acc: {:.4f}'
               .format(epoch+1, num_epochs, train_loss, train_acc, val_loss, val_acc))
+        
+        # EarlyStopper
+        if train_early_stopper.early_stop(val_loss):
+            break
         
         with open(exp_dir + '/results_train.txt', 'a') as file:
             file.write(
