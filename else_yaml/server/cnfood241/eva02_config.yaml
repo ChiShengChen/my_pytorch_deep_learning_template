@@ -1,17 +1,17 @@
-batchsize: 32
+batchsize: 4
 num_class: 241
 image_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train600x600/"
 train_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train_n.txt"
 test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/test_n.txt"
 
-model_name: "mobilevitv2_100.cvnets_in1k"
-weight_path: "/home/meow/cnfood241/food_code_cn241/outputs/mobilevitv2_100_in1k_448_cn241/model.pth"
-store_name: "mobilevitv2_100_in1k_448_cn241"
+model_name: "eva02_large_patch14_448.mim_m38m_ft_in22k_in1k"
+weight_path: ""
+store_name: "eva02_large_patch14_448.mim_m38m_ft_in22k_in1k_448_cn241"
 
 img_size: 448
 learning_rate: 0.00001
 epoch: 100
 
-is_test: true
+is_test: false
 use_pretrained: true
 train_increased: false

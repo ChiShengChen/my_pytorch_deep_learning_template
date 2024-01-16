@@ -6,6 +6,14 @@ from prenet.self_attention import self_attention
 from dropblock import DropBlock2D
 import numpy as np
 
+
+# PRENet (2023):
+# Large Scale Visual Food Recognition
+# paper: https://arxiv.org/abs/2103.16107
+# code: https://github.com/Liuyuxinict/prenet/
+
+
+
 class PRENet(nn.Module):
     def __init__(self, model, feature_size, classes_num):
         super(PRENet, self).__init__()

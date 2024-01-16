@@ -7,13 +7,17 @@ import re
 from mobileformer.mobile_former import mobile_former_508m, mobile_former_96m
 from prenet.resnet import resnet50
 from prenet.prenet import PRENet
+from cmal.cmal_net import CMALNet
+
+from torch.utils.model_zoo import load_url as load_state_dict_from_url
+
 
 timm_models = ['convnextv2_nano.fcmae_ft_in1k', 'convnextv2_femto.fcmae_ft_in1k', 'mobilevitv2_100.cvnets_in1k', 'mobilevitv2_200.cvnets_in22k_ft_in1k_384',
 'pvt_v2_b2_li.in1k', 'mobilenetv3_large_100', 'repvit_m0_9', 'repvit_m2_3', 'beit_large_patch16_512.in22k_ft_in22k_in1k', 'eva02_large_patch14_448.mim_m38m_ft_in22k_in1k', 
 'maxvit_xlarge_tf_512.in21k_ft_in1k', 'vit_huge_patch14_clip_336.laion2b_ft_in12k_in1k','convnextv2_huge.fcmae_ft_in22k_in1k_512',
-'inception_v4.tf_in1k', 'vgg16.tv_in1k', 'resnet101.a3_in1k','densenet121.ra_in1k', 'legacy_senet154.in1k']
+'inception_v4.tf_in1k', 'vgg16.tv_in1k', 'resnet101.a3_in1k','densenet121.ra_in1k', 'legacy_senet154.in1k','vgg11.tv_in1k']
 pytorch_models = ['resnet50'] 
-custom_models = ['mobile_former_508m', 'mobile_former_96m','prenet']
+custom_models = ['mobile_former_508m', 'mobile_former_96m', 'prenet', 'cmal-net']
 
 total_model_lists = timm_models + pytorch_models + custom_models
 
@@ -146,8 +150,6 @@ def get_model(model_name, use_pretrained, train_increased, num_classes, weight_p
                 incre_trained = torch.load(weight_path) # incre_trained has fc
                 # print(incre_trained.keys())
                 model.load_state_dict(incre_trained)
-                              
-
             else:
                 model = resnet50(pretrained=False)
                 model = PRENet(model, 512, classes_num=num_classes)
@@ -166,6 +168,37 @@ def get_model(model_name, use_pretrained, train_increased, num_classes, weight_p
                 model.fc = nn.Linear(2048, num_classes)
             total_params = sum(p.numel() for p in model.parameters())
             print(f"Total parameters in the model: {total_params}")
+        
+        if model_name == 'cmal-net':
+            if is_test:
+                net = models.resnet50()
+                model = CMALNet()
+            elif use_pretrained:
+                model = models.resnet50()
+                state_dict = load_state_dict_from_url('https://download.pytorch.org/models/resnet50-19c8e357.pth')
+                model.load_state_dict(state_dict)
+                # model.load_state_dict(torch.load(weight_path)['state_dict'])
+                net_layers = list(model.children())
+                net_layers = net_layers[0:8]
+                model = CMALNet(net_layers, num_classes) 
+            elif train_increased:
+                model = models.resnet50()
+                model.load_state_dict(torch.load(weight_path)['state_dict'])
+                net_layers = list(model.children())
+                net_layers = net_layers[0:8]
+                model = CMALNet(net_layers, num_classes) 
+                incre_trained = torch.load(weight_path) # incre_trained has fc
+                # print(incre_trained.keys())
+                model.load_state_dict(incre_trained)
+            else:
+                model = models.resnet50()
+                model.load_state_dict(torch.load(weight_path)['state_dict'])
+                net_layers = list(model.children())
+                net_layers = net_layers[0:8]
+                model = CMALNet(net_layers, num_classes=num_classes)
+            total_params = sum(p.numel() for p in model.parameters())
+            print(f"Total parameters in the model: {total_params}")
+                
 
 
     return model

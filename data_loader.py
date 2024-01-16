@@ -52,19 +52,30 @@ class MyDataset(torch.utils.data.Dataset):
         # if the label is the single-label it can be the int
         # if the multilabel can be the list to torch.tensor
 
-def load_data(image_path, train_dir, test_dir, batch_size, img_size):
+def load_data(image_path, train_dir, test_dir, batch_size, img_size, model_name):
     normalize = transforms.Normalize(mean=[0.5457954, 0.44430383, 0.34424934],
                                      std=[0.23273608, 0.24383051, 0.24237761])
-    train_transforms = transforms.Compose([
-        transforms.RandomHorizontalFlip(p=0.5),  # default value is 0.5
-        transforms.RandomRotation(degrees=15),
-        transforms.ColorJitter(brightness=0.126, saturation=0.5),
+    
+    if model_name == 'cmal-net':
+        train_transforms = transforms.Compose([
         transforms.Resize((550, 550)),
-        # transforms.RandomCrop(448),
-        transforms.RandomCrop(img_size),
+        transforms.RandomCrop(448, padding=8),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        normalize
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
+
+    else:
+        train_transforms = transforms.Compose([
+            transforms.RandomHorizontalFlip(p=0.5),  # default value is 0.5
+            transforms.RandomRotation(degrees=15),
+            transforms.ColorJitter(brightness=0.126, saturation=0.5),
+            transforms.Resize((550, 550)),
+            # transforms.RandomCrop(448),
+            transforms.RandomCrop(img_size),
+            transforms.ToTensor(),
+            normalize
+        ])
 
     # transforms of test dataset
     test_transforms = transforms.Compose([

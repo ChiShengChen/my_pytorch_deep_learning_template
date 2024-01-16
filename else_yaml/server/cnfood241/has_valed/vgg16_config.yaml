@@ -14,3 +14,4 @@ epoch: 20
 
 is_test: true
 use_pretrained: true
+train_increased: false

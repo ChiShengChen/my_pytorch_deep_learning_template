@@ -4,7 +4,7 @@ import torch
 from torch import nn
 from torch.optim import lr_scheduler
 from val_func import val, val_prenet
-from train_func import train_general, train_prenet
+from train_func import train_general, train_prenet, train_cmal
 import os
 from torch.backends import cudnn
 
@@ -17,9 +17,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def main(args):
     # args = parse_option()
     train_dataset, train_loader, test_dataset, test_loader = \
-        load_data(image_path=args["image_path"], train_dir=args["train_path"], test_dir=args["test_path"], batch_size=args["batchsize"], img_size=args["img_size"])
+        load_data(image_path=args["image_path"], train_dir=args["train_path"], test_dir=args["test_path"], batch_size=args["batchsize"], img_size=args["img_size"], model_name=args["model_name"])
     # print('Data Preparation : Finished')
-    criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.CrossEntropyLoss() # CELoss
+    # criterion = torch.nn.KLDivLoss(reduction="batchmean") # KLLoss
 
     NUM_CATEGORIES = args["num_class"]  
 
@@ -36,7 +37,20 @@ def main(args):
         new_params = filter(lambda p: id(p) not in ignored_params, model.parameters())
         optimizer = torch.optim.SGD([
             {'params': model.features.parameters(), 'lr': args["learning_rate"]*0.1},
-            {'params': new_params, 'lr': args["learning_rate"]}
+            {'params': new_params,                  'lr': args["learning_rate"]}
+        ],
+            momentum=0.9, weight_decay=5e-4)
+
+    elif args["model_name"] == 'cmal-net':
+        optimizer = torch.optim.SGD([
+        {'params': model.classifier_concat.parameters(), 'lr': args["learning_rate"]},
+        {'params': model.conv_block1.parameters(),       'lr': args["learning_rate"]},
+        {'params': model.classifier1.parameters(),       'lr': args["learning_rate"]},
+        {'params': model.conv_block2.parameters(),       'lr': args["learning_rate"]},
+        {'params': model.classifier2.parameters(),       'lr': args["learning_rate"]},
+        {'params': model.conv_block3.parameters(),       'lr': args["learning_rate"]},
+        {'params': model.classifier3.parameters(),       'lr': args["learning_rate"]}, #0.002
+        {'params': model.Features.parameters(),          'lr': args["learning_rate"]*0.1} #0.0002
         ],
             momentum=0.9, weight_decay=5e-4)
     else:
@@ -68,6 +82,8 @@ def main(args):
     print('='*20)
     if args["model_name"] == 'prenet':
         train_prenet(model, train_loader, test_loader, criterion, optimizer, scheduler, args["epoch"], args["store_name"], device)
+    elif args["model_name"] == 'cmal-net':
+        train_cmal(model, train_loader, test_loader, criterion, optimizer, lr_scheduler, args["epoch"], args["store_name"], device)
     else:
         train_general(model, train_loader, test_loader, criterion, optimizer, scheduler, args["epoch"], args["store_name"], device)
 

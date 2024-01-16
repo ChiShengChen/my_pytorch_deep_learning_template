@@ -1,5 +1,6 @@
 import torch
 import tqdm
+from cmal.utils import map_generate, highlight_im
 
 def val(model, criterion, val_loader, device):
     model.eval()
@@ -95,3 +96,70 @@ def val_prenet(model, criterion, val_loader, device):
     val_acc_en = val_en_corrects1 / len(val_loader.dataset)
     val5_acc_en = val_en_corrects5 / len(val_loader.dataset)
     return val_loss, val_acc, val5_acc, val_acc_en, val5_acc_en 
+
+
+def val_cmal(net, criterion, batch_size, testloader_in):
+    net.eval()
+    use_cuda = torch.cuda.is_available()
+    test_loss = 0
+    correct = 0
+    correct_com = 0
+    correct_com2 = 0
+    total = 0
+    idx = 0
+    device = torch.device("cuda")
+
+    # testset = torchvision.datasets.ImageFolder(root=test_path,
+    #                                            transform=transform_test)
+    # testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=True, num_workers=4)
+    testloader = testloader_in
+
+    for batch_idx, (inputs, targets) in enumerate(testloader):
+        idx = batch_idx
+        if use_cuda:
+            inputs, targets = inputs.to(device), targets.to(device)
+        
+        with torch.no_grad():
+        # inputs, targets = Variable(inputs, volatile=True), Variable(targets)
+            inputs = torch.tensor(inputs)
+            targets = torch.tensor(targets)
+            output_1, output_2, output_3, output_concat, map1, map2, map3 = net(inputs)
+
+            p1 = net.state_dict()['classifier3.1.weight']
+            p2 = net.state_dict()['classifier3.4.weight']
+            att_map_3 = map_generate(map3, output_3, p1, p2)
+
+            p1 = net.state_dict()['classifier2.1.weight']
+            p2 = net.state_dict()['classifier2.4.weight']
+            att_map_2 = map_generate(map2, output_2, p1, p2)
+
+            p1 = net.state_dict()['classifier1.1.weight']
+            p2 = net.state_dict()['classifier1.4.weight']
+            att_map_1 = map_generate(map1, output_1, p1, p2)
+
+            inputs_ATT = highlight_im(inputs, att_map_1, att_map_2, att_map_3)
+            output_1_ATT, output_2_ATT, output_3_ATT, output_concat_ATT, _, _, _ = net(inputs_ATT)
+
+            outputs_com2 = output_1 + output_2 + output_3 + output_concat
+            outputs_com = outputs_com2 + output_1_ATT + output_2_ATT + output_3_ATT + output_concat_ATT
+
+            loss = criterion(output_concat, targets)
+
+            test_loss += loss.item()
+            _, predicted = torch.max(output_concat.data, 1)
+            _, predicted_com = torch.max(outputs_com.data, 1)
+            _, predicted_com2 = torch.max(outputs_com2.data, 1)
+            total += targets.size(0)
+            correct += predicted.eq(targets.data).cpu().sum()
+            correct_com += predicted_com.eq(targets.data).cpu().sum()
+            correct_com2 += predicted_com2.eq(targets.data).cpu().sum()
+
+            # if batch_idx % 50 == 0:
+            print('Step: %d | Loss: %.3f |Combined Acc: %.3f%% (%d/%d)' % (
+            batch_idx, test_loss / (batch_idx + 1),
+            100. * float(correct_com) / total, correct_com, total))
+
+    test_acc_en = 100. * float(correct_com) / total
+    test_loss = test_loss / (idx + 1)
+
+    return test_acc_en, test_loss

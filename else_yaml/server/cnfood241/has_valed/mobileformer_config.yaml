@@ -8,11 +8,12 @@ model_name: "mobile_former_96m"
 # weight_path: "pretrained_models/mobile-former-96m.pth.tar"
 weight_path: "/home/meow/cnfood241/food_code_cn241/outputs/mobileformer_96m_in1k_448_cn241/model.pth"
 
-store_name: "mobileformer_96m_in1k_448_cn241"
+store_name: "mobileformer_96m_in1k_448_cn241_test"
 
 img_size: 448
 learning_rate: 0.00001
-epoch: 100
+epoch: 2
 
-is_test: true
-use_pretrained: true
+is_test: false
+use_pretrained: false
+train_increased: true
