@@ -1,7 +1,7 @@
 # my_pytorch_deep_learning_template
 
 ## 20240116 Update
-Add PRENet modified from /n
+Add PRENet modified from \n
 PRENet (2023): /n
 Large Scale Visual Food Recognition /n
 paper: https://arxiv.org/abs/2103.16107 /n
