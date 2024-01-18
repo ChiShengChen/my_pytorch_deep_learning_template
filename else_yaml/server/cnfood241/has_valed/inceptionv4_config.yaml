@@ -1,8 +1,10 @@
 batchsize: 32
 num_class: 241
-image_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train600x600/"
+# image_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train600x600/"
+image_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/val600x600/"
 train_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train_n.txt"
-test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/test_n.txt"
+# test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/test_n.txt"
+test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/val_n.txt"
 
 model_name: "inception_v4.tf_in1k"
 weight_path: "/home/meow/cnfood241/food_code_cn241/outputs/inception_v4.tf_in1k_299_cn241/model.pth"

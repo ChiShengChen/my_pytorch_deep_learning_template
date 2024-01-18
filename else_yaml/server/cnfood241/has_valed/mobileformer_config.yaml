@@ -1,8 +1,10 @@
 batchsize: 32
 num_class: 241
 image_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train600x600/"
+# image_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/val600x600/"
 train_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train_n.txt"
 test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/test_n.txt"
+# test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/val_n.txt"
 
 model_name: "mobile_former_96m"
 # weight_path: "pretrained_models/mobile-former-96m.pth.tar"
@@ -14,6 +16,6 @@ img_size: 448
 learning_rate: 0.00001
 epoch: 2
 
-is_test: false
+is_test: true
 use_pretrained: false
 train_increased: true

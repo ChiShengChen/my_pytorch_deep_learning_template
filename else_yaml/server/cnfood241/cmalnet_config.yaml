@@ -1,0 +1,23 @@
+batchsize: 8
+num_class: 241
+image_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train600x600/"
+train_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train_n.txt"
+test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/test_n.txt"
+
+# for debug
+# train_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/small_dataset_for_model_debug/train_s_n.txt"
+# test_path: "/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/small_dataset_for_model_debug/test_s_n.txt"
+
+model_name: "cmal-net"
+weight_path: "/home/meow/cnfood241/food_code_cn241/pretrained_models/resnet50-19c8e357.pth"
+# weight_path: "/home/meow/cnfood241/food_code_cn241/outputs/prenet_cn241/model.pth"
+
+store_name: "cmal_resnet50_cnfood241"
+
+img_size: 512
+learning_rate: 0.002
+epoch: 50
+
+is_test: false
+use_pretrained: true
+train_increased: false

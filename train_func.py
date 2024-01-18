@@ -275,8 +275,6 @@ def train_cmal(model, train_loader, val_loader, criterion, optimizer, lr_schedul
             loss3.backward()
             optimizer.step()
 
-
-
             p1 = model.state_dict()['classifier3.1.weight']
             p2 = model.state_dict()['classifier3.4.weight']
             att_map_3 = map_generate(map3, output_3, p1, p2)
@@ -334,7 +332,6 @@ def train_cmal(model, train_loader, val_loader, criterion, optimizer, lr_schedul
             concat_loss_ATT.backward()
             optimizer.step()
 
-
             # Train the concatenation of the experts with the raw input
             optimizer.zero_grad()
             _, _, _, output_concat, _, _, _ = netp(inputs)
@@ -353,12 +350,12 @@ def train_cmal(model, train_loader, val_loader, criterion, optimizer, lr_schedul
             train_loss4 += concat_loss_ATT.item()
             train_loss5 += concat_loss.item()
 
-        # if epoch % 50 == 0:
-        print(
-            'Step: %d | Loss1: %.3f | Loss2: %.5f | Loss3: %.5f | Loss_ATT: %.5f |Loss_concat: %.5f | Loss: %.3f | Acc: %.3f%% (%d/%d)' % (
-            epoch, train_loss1 / (epoch + 1), train_loss2 / (epoch + 1),
-            train_loss3 / (epoch + 1), train_loss4 / (epoch + 1),  train_loss5/ (epoch + 1), train_loss / (epoch + 1),
-            100. * float(correct) / total, correct, total))
+        if epoch % 100 == 0:
+            print(
+                'Step: %d | Loss1: %.3f | Loss2: %.5f | Loss3: %.5f | Loss_ATT: %.5f |Loss_concat: %.5f | Loss: %.3f | Acc: %.3f%% (%d/%d)' % (
+                epoch, train_loss1 / (epoch + 1), train_loss2 / (epoch + 1),
+                train_loss3 / (epoch + 1), train_loss4 / (epoch + 1),  train_loss5/ (epoch + 1), train_loss / (epoch + 1),
+                100. * float(correct) / total, correct, total))
 
 
         # Calculate the train loss and accuracy
@@ -368,7 +365,6 @@ def train_cmal(model, train_loader, val_loader, criterion, optimizer, lr_schedul
         # EarlyStopper
         # if train_early_stopper.early_stop(val_loss):
         #     break
-        
 
         with open(exp_dir + '/results_train.txt', 'a') as file:
             file.write(
@@ -377,23 +373,31 @@ def train_cmal(model, train_loader, val_loader, criterion, optimizer, lr_schedul
                 train_loss4 / (idx + 1), train_loss5 / (idx + 1)))
 
 
-        # if epoch < 5 or epoch >= 100:
+        if epoch < 5 or epoch >= 100:
         # val_loss, val_acc, val5_acc = val(model, criterion, val_loader, device)
-        val_acc_com, val_loss = val_cmal(model, CELoss, 3, val_loader)
-        if val_acc_com > max_val_acc:
-            max_val_acc = val_acc_com
-            # net.cpu()
-            torch.save(model.state_dict(), './outputs/' + store_name + '/model.pth')
-            # net.to(device)
-        with open(exp_dir + '/results_test.txt', 'a') as file:
-            file.write('Iteration %d, test_acc_combined = %.5f, test_loss = %.6f\n' % (
-            epoch, val_acc_com, val_loss))
-        # else:
-        #     model.cpu()
-        #     torch.save(model, './' + store_name + '/model.pth')
-        #     model.to(device)
+            # val_acc_com, val_loss = val_cmal(model, CELoss, val_loader)
+            val_loss, val_acc, val5_acc, val_acc_en, val5_acc_en, val_acc_com, val_loss = val_cmal(model, CELoss, val_loader)
+            if val_acc_com > max_val_acc:
+                max_val_acc = val_acc_com
+                # net.cpu()
+                model.cpu()
+                torch.save(model.state_dict(), './outputs/' + store_name + '/model.pth')
+                print("/model.pth has saved successfully!")
+                # net.to(device)
+                model.to(device)
+            with open(exp_dir + '/results_test.txt', 'a') as file:
+                file.write('Iteration %d, test_acc_combined = %.5f, test_loss = %.6f\n' % (
+                epoch, val_acc_com, val_loss))
+        else:
+            model.cpu()
+            torch.save(model, './outputs/' + store_name + '/model.pth')
+            print("/model.pth has saved successfully! e")
+            model.to(device)
 
         with open(exp_dir + '/results_test.txt', 'a') as file:
             file.write(
                 'Epoch %d, top1 = %.5f, top5 = %.5f, val_loss = %.6f\n' % (
+                    epoch, val_acc, val5_acc, val_loss))
+        
+        print('Epoch %d, top1 = %.5f, top5 = %.5f, val_loss = %.6f\n' % (
                     epoch, val_acc, val5_acc, val_loss))

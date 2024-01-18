@@ -97,6 +97,8 @@ class CMALNet(nn.Module):
         map1 = x1_.detach()
         x1_ = self.max_pool1(x1_)
         x1_f = x1_.view(x1_.size(0), -1)
+        
+        # print("x1_f.shape", x1_f.shape) #[16,1024] batchsize=16
 
         x1_c = self.classifier1(x1_f)
 

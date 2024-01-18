@@ -53,15 +53,20 @@ def write_to_txt(data, output_txt):
         file.writelines(data)
 
 
-input_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train600x600_raw.txt'
+# input_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train600x600_raw.txt'
+input_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/val600x600_raw.txt'
 
-train_ratio = 0.7
+# train_ratio = 0.7
+train_ratio = 1.0
 class_num = 241
 
 train_data, test_data = split_data_by_cat(input_txt, train_ratio, class_num)
 
-train_output_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train_n.txt'
-test_output_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/test_n.txt'
+# train_output_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/train_n.txt'
+# test_output_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/test_n.txt'
+
+train_output_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/val_n.txt'
+test_output_txt = '/home/meow/my_data_disk_5T/food_classification/CNFOOD-241/testn_n.txt'
 
 write_to_txt(train_data, train_output_txt)
 write_to_txt(test_data, test_output_txt)
